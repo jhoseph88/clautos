@@ -1,0 +1,64 @@
+<div class="row">
+	<div class="col-md-6">
+		<h1>Craigslist Auto Search</h1>
+		<form (ngSubmit)="onSubmit(); this.searchForm.reset()" #searchForm>
+			<label for="make">Make:</label>
+			<input type="text" 
+				   class="form-control" 
+				   id="make" 
+				   [(ngModel)]="query.make"
+				   name="make">
+				   <br>
+			<label for="model">Model:</label>
+			<input type="text"
+				   class="form-control" 
+				   id="model"
+				   [(ngModel)]="query.model"
+				   name="model">
+				   <br>
+			<strong>Transmission:</strong>
+			<div class="checkbox">
+				<label>
+					<input type="checkbox" 
+						   [(ngModel)]="manual" 
+						   name="manual">
+					Manual
+				</label>
+				<label>
+					<input type="checkbox" [(ngModel)]="automatic" 
+						   name="automatic">
+					Automatic
+				</label>
+				<label>
+					<input type="checkbox" [(ngModel)]="other" name="other">
+					Other
+				</label>
+			</div>
+			<!-- Price range slider -->
+			<p>
+				<label for="price">Price range:</label>
+			  	<input type="text" id="price" 
+			  		   readonly style="border:0; color:#f6931f; 
+			  		   				   font-weight:bold;">
+			</p>
+			<div id="price-range"></div>
+			<br>
+			<!-- Year range slider -->
+			<p>
+				<label for="year">Year range:</label>
+			  	<input type="text" id="year" 
+			  		   readonly style="border:0; color:#f6931f; 
+			  		   				   font-weight:bold;">
+			</p>
+			<div id="year-range"></div>
+			<br>
+			<button type="submit" class="btn btn-default">Search</button>
+		</form>
+	</div>
+	<div class="col-md-6" [hidden]="!submitted">
+		<br>
+		<h4>Search Results:</h4>
+		<app-listings [listings]="listings">
+		</app-listings>
+	</div>
+</div>
