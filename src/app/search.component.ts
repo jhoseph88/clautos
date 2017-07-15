@@ -139,7 +139,6 @@ export class SearchComponent implements AfterViewInit {
 					this.removeDuplicates();
 					// set submitted to true to show listings once returned
 					this.submitted = true;
-					console.log('returned from search');
 				}
 			);
 		}

@@ -5,19 +5,30 @@ var request = require('request')
 
 var baseUrl = '.craigslist.org'
 
-/* parses the listing page to fetch the main image url and returns an object
-   containing the listing url and the fetched image url */
-function getImgUrl(listingUrl, imgFileName, /*price,*/ callback) {
+/* parses the listing page to fetch the main image url and mileage and returns 
+   an object containing the listing url and the fetched image url */
+function getListingDetail(listingUrl, imgFileName, price, callback) {
 	request(listingUrl, (err, resp, body) => {
 		if (err) {
 			console.log('error: ' + err)
 			return
 		}
+
+		// get image url 
 		var baseImgUrl = 'https://images.craigslist.org/'
 		var alnum = '[0-9a-zA-Z]*'
 		var imgUrlRegex = new RegExp(`${baseImgUrl}${imgFileName}_${alnum}x${alnum}\.jpg`, 'gm')
 		var imgUrl = body.match(imgUrlRegex)[0]
-		callback({url: listingUrl, imgUrl: imgUrl/*, price: price*/})
+
+		// get mileage
+		var mileageRegex = /<span>odometer: <b>[0-9]*</g
+		var mileageMatches = body.match(mileageRegex)
+		var mileage = mileageMatches ? mileageMatches[0] : null
+		var numRegex = /[0-9]+/g
+		var miles = mileageMatches ? numRegex.exec(mileage)[0] : null
+
+		callback({url: listingUrl, imgUrl: imgUrl, price: price, 
+				  mileage: miles})
 	})
 }
 
@@ -26,14 +37,14 @@ function getImgUrl(listingUrl, imgFileName, /*price,*/ callback) {
    { listingUrl, imgUrl, price} */
 function getListingData(city, res, callback) {
 	// get array of anchor tag strings--one string for each listing
-	var metaRegex = /<a.*html.*result-image.*>/gm//FIXME - make this include price
+	var metaRegex = /<a.*html.*result-image.*>\n.*</gm//FIXME - make this include price
 	// get unique listings by filtering (quadratic time - bad)
 	var anchorMatches = res.match(metaRegex)
 	var anchorElts = anchorMatches.filter( (elt, idx) => {
 		return anchorMatches.indexOf(elt) === idx
 	})
 	if (anchorElts === null)
-		callback([])
+		callback('No results.')
 
 	var listingBaseUrl = 'https://' + city + baseUrl
 
@@ -47,23 +58,19 @@ function getListingData(city, res, callback) {
 	/* loop through anchorElts, fetch each listing url, and add a listing object
 	   for each listing found containing the listings's url and its image url */
 	anchorElts.forEach( (anchorElt) => {
-		console.log(anchorElt)
 		listingUrl = listingBaseUrl + anchorElt.match(urlRegex)[0]
-		// price = anchorElt.match(priceRegex)
-		// // if (!price)
-		// // 	price = 0
-		// // else
-		// // 	price = anchorElt.match(priceRegex)[0]
-		price = 0
+		price = anchorElt.match(priceRegex)
+		price = price ? anchorElt.match(priceRegex)[0] : 0
 		imgMatch = anchorElt.match(imgRegEx)
 		// default image if none found
 		if (!imgMatch) {
 			imgFileName = '../../assets/images/no_img.png'
-			listingData.push({url: listingUrl, imgUrl: imgFileName/*, price: price*/})
-			//i--
+			listingData.push({url: listingUrl, imgUrl: imgFileName, 
+							  price: price, mileage: null})
+			i--
 		} else {
 			imgFileName = imgMatch[0]
-			getImgUrl(listingUrl, imgFileName, /*price,*/ (listingObj) => {
+			getListingDetail(listingUrl, imgFileName, price, (listingObj) => {
 				listingData.push(listingObj)
 				if (--i === 0)
 					callback(listingData)

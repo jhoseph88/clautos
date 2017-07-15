@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 import { Observable } from 'rxjs/Observable';
 
@@ -13,12 +13,8 @@ import { SearchService } from './search.service';
 		}
 	`]
 })
-export class ListingsComponent implements OnInit {
+export class ListingsComponent {
 	@Input() listings: any[];
 
 	constructor(private searchService: SearchService) {}
-
-	ngOnInit() {
-		
-	}
 }
