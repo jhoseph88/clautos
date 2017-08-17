@@ -52,7 +52,29 @@
 			</p>
 			<div id="year-range"></div>
 			<br>
-			<button type="submit" class="btn btn-default">Search</button>
+			<!-- City selector dropdown -->
+			<label for="citySelector">City:</label><br>
+			<select name="citySelect" 
+					id="citySelector" 
+					[(ngModel)]="selectedCity">
+				<option *ngFor="let city of cities">
+					{{ city }}
+				</option>
+			</select>
+			<br>
+			<br>
+			<button type="submit" class="btn btn-default" *ngIf="!submitted">	
+				Search
+			</button>
+			<button type="submit" class="btn btn-default" *ngIf="submitted">	
+				Append
+			</button>
+			<button type="button" 
+					class="btn btn-default" 
+					*ngIf="submitted"
+					(click)="clear()">	
+				Clear
+			</button>
 		</form>
 	</div>
 	<div class="col-md-6" [hidden]="!submitted">

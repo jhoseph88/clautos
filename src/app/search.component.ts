@@ -1,6 +1,7 @@
 import { Component, AfterViewInit } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
+import {  HttpClient } from '@angular/common/http'
 
-import { SearchService } from './search.service';
 import { Query } from './query';
 
 declare var $:any;
@@ -16,7 +17,8 @@ export class SearchComponent implements AfterViewInit {
 	automatic: boolean = false;
 	other: boolean = false;
 	submitted: boolean = false;
-	listings: string[] = [];
+	listings: any[] = [];
+	selectedCity: string = 'chicago'
 
 	cities: string[] = ['auburn', 'bham', 'dothan', 'shoals', 'gadsden', 
 						'huntsville', 'mobile', 'montgomery', 'tuscaloosa', 
@@ -116,7 +118,7 @@ export class SearchComponent implements AfterViewInit {
 						'racine', 'lacrosse', 'madison', 'milwaukee',
 						'northernwi', 'sheboygan', 'wausau', 'wyoming'];
 
-	constructor(private searchService: SearchService) {}
+	constructor(private http: HttpClient) {}
 
 	removeDuplicates() {
 		this.listings = this.listings.filter( (elt, idx) => {
@@ -124,25 +126,32 @@ export class SearchComponent implements AfterViewInit {
 		});
 	}
 
-	onSubmit() {
+	// 
+	getUrl() {
 		if (this.manual)
 			this.query.transmission.push(1);
 		if (this.automatic)
 			this.query.transmission.push(2);
 		if (this.other)
 			this.query.transmission.push(3);
-		for (let i: number = 0; i < /*this.cities.length*/1; i++) {
-			this.searchService.search(this.query, /*this.cities[i]*/'atlanta').then(
-				(listings) => {
-					this.listings = this.listings.concat(listings);
-					// remove any duplicates concat created
-					this.removeDuplicates();
-					// set submitted to true to show listings once returned
-					this.submitted = true;
-				}
-			);
-		}
+		let url = '/api/listings?' + `auto_make_model=${this.query.make}+` +
+				  `${this.query.model}&city=${this.selectedCity}` + 
+				  `&min_price=${this.query.minPrice}` + 
+	 			  `&max_price=${this.query.maxPrice}` + 
+	 			  `&min_auto_year=${this.query.minYear}` + 
+	 			  `&max_auto_year=${this.query.maxYear}`;
+	 	return url;
 	}
+
+	onSubmit() {
+		this.http.get(this.getUrl() ).subscribe(listings => {
+				this.listings = this.listings.concat(listings)
+				// remove any duplicates concat created
+		 		this.removeDuplicates()
+		 		// set submitted to true to show listings once returned
+		 		this.submitted = true;
+		});
+	}	
 
 	ngAfterViewInit() {
 		// Logic for price range slider
@@ -178,8 +187,14 @@ export class SearchComponent implements AfterViewInit {
 	          this.query.maxYear = ui.values[1];
 	        }
 	      });
-	      $('#year').val($('#year-range').slider('values', 0 ) +
-	        ' - ' + $('#year-range').slider('values', 1 ) );
+	      $('#year').val($('#year-range').slider('values', 0 ) + ' - ' + 
+	      $('#year-range').slider('values', 1 ) );
 	    });
+	}
+
+	// clear listings from previous searches
+	clear() {
+		this.listings = [];
+		this.submitted = false;
 	}
 }

@@ -1,12 +1,11 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { HttpModule, JsonpModule } from '@angular/http';
+import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 import { ListingsComponent } from './listings.component';
 import { SearchComponent } from './search.component';
-import { SearchService } from './search.service';
 import { ListingComponent } from './listing.component';
 
 @NgModule({
@@ -19,10 +18,8 @@ import { ListingComponent } from './listing.component';
   imports: [
     BrowserModule,
     FormsModule,
-    HttpModule,
-    JsonpModule
+    HttpClientModule
   ],
-  providers: [SearchService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

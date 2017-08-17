@@ -18,17 +18,33 @@ function getListingDetail(listingUrl, imgFileName, price, callback) {
 		var baseImgUrl = 'https://images.craigslist.org/'
 		var alnum = '[0-9a-zA-Z]*'
 		var imgUrlRegex = new RegExp(`${baseImgUrl}${imgFileName}_${alnum}x${alnum}\.jpg`, 'gm')
-		var imgUrl = body.match(imgUrlRegex)[0]
+		var imgUrl = body.match(imgUrlRegex)
+		// default image if none found
+		var imgUrl = imgUrl ? imgUrl[0] : '../../assets/images/no_img.png'
 
 		// get mileage
 		var mileageRegex = /<span>odometer: <b>[0-9]*</g
 		var mileageMatches = body.match(mileageRegex)
 		var mileage = mileageMatches ? mileageMatches[0] : null
 		var numRegex = /[0-9]+/g
-		var miles = mileageMatches ? numRegex.exec(mileage)[0] : null
+		var miles = mileageMatches ? numRegex.exec(mileage)[0] : ''
+
+		// get description
+		var descRegex = /<meta name="description" content=".*>/g
+		var descMatches = descRegex.exec(body)
+
+		var description = descMatches ? descMatches[0] : ''
+		var descContentRegex = /content=".*>/g
+		descMatches = description ? descContentRegex.exec(description) : ''
+		description = descMatches ? descMatches[0] : ''
+
+		descContentRegex = /".*?"/g
+		descMatches = description ? descContentRegex.exec(description) : ''
+		description = descMatches ? descMatches[0] : ''
+		description = description.replace(/"/g, '')
 
 		callback({url: listingUrl, imgUrl: imgUrl, price: price, 
-				  mileage: miles})
+				  mileage: miles, description: description })
 	})
 }
 
@@ -40,11 +56,13 @@ function getListingData(city, res, callback) {
 	var metaRegex = /<a.*html.*result-image.*>\n.*</gm//FIXME - make this include price
 	// get unique listings by filtering (quadratic time - bad)
 	var anchorMatches = res.match(metaRegex)
+	// return immediately if no results found
+	if (anchorElts === null)
+		callback('No results.')
+	
 	var anchorElts = anchorMatches.filter( (elt, idx) => {
 		return anchorMatches.indexOf(elt) === idx
 	})
-	if (anchorElts === null)
-		callback('No results.')
 
 	var listingBaseUrl = 'https://' + city + baseUrl
 
@@ -66,7 +84,7 @@ function getListingData(city, res, callback) {
 		if (!imgMatch) {
 			imgFileName = '../../assets/images/no_img.png'
 			listingData.push({url: listingUrl, imgUrl: imgFileName, 
-							  price: price, mileage: null})
+							  price: price, mileage: '', description: ''})
 			i--
 		} else {
 			imgFileName = imgMatch[0]
@@ -93,7 +111,7 @@ router.get('/', (req, res) => {
 });
 
 // Get matching listings
-router.get('/listings', (req, res) => {
+router.get('/listings', (req, res) => {8
 	// extract data from query using express
 	var minPrice = req.query.min_price, maxPrice = req.query.max_price
 	var minYear = req.query.min_auto_year, maxYear = req.query.max_auto_year
