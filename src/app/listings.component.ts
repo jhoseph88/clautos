@@ -8,6 +8,12 @@ import { Observable } from 'rxjs/Observable';
 	styles: [`
 		.cropped {
 			object-fit: cover;
+			margin: 5px;
+		}
+
+		a {
+			text-decoration: none;
+			color: black;
 		}
 	`]
 })

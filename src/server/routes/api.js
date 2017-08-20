@@ -53,13 +53,14 @@ function getListingDetail(listingUrl, imgFileName, price, callback) {
    { listingUrl, imgUrl, price} */
 function getListingData(city, res, callback) {
 	// get array of anchor tag strings--one string for each listing
-	var metaRegex = /<a.*html.*result-image.*>\n.*</gm//FIXME - make this include price
-	// get unique listings by filtering (quadratic time - bad)
+	var metaRegex = /<a.*html.*result-image.*>\n.*</gm
 	var anchorMatches = res.match(metaRegex)
 	// return immediately if no results found
-	if (anchorElts === null)
-		callback('No results.')
-	
+	if (anchorMatches === null) {
+		callback({msg: 'No results.'})
+		return
+	}
+	// get unique listings by filtering (quadratic time - bad)
 	var anchorElts = anchorMatches.filter( (elt, idx) => {
 		return anchorMatches.indexOf(elt) === idx
 	})
@@ -111,7 +112,7 @@ router.get('/', (req, res) => {
 });
 
 // Get matching listings
-router.get('/listings', (req, res) => {8
+router.get('/listings', (req, res) => {
 	// extract data from query using express
 	var minPrice = req.query.min_price, maxPrice = req.query.max_price
 	var minYear = req.query.min_auto_year, maxYear = req.query.max_auto_year
@@ -134,7 +135,7 @@ router.get('/listings', (req, res) => {8
 			return
 		}
 		getListingData(city, body, (listings) => {
-			res.status(resp.statusCode).json(listings)
+			res.json(listings)
 		})
 	})
 })

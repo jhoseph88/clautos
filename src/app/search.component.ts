@@ -8,7 +8,18 @@ declare var $:any;
 
 @Component({
 	selector: 'app-search',
-	templateUrl: './search.component.html'
+	templateUrl: './search.component.html',
+	styles: [
+		`#search-form-outer {
+			position: relative;
+		}
+
+		@media (min-width: 992px) {
+			#search-form {
+				position: fixed;
+			}
+		}`
+	]
 })
 export class SearchComponent implements AfterViewInit {
 	// example/default query
@@ -145,11 +156,11 @@ export class SearchComponent implements AfterViewInit {
 
 	onSubmit() {
 		this.http.get(this.getUrl() ).subscribe(listings => {
-				this.listings = this.listings.concat(listings)
-				// remove any duplicates concat created
-		 		this.removeDuplicates()
-		 		// set submitted to true to show listings once returned
-		 		this.submitted = true;
+			this.listings = this.listings.concat(listings)
+			// remove any duplicates concat created
+	 		this.removeDuplicates()
+	 		// set submitted to true to show listings once returned
+	 		this.submitted = true;
 		});
 	}	
 

@@ -1,16 +1,18 @@
 <div class="panel-group">
 	<div class="panel panel-default" *ngFor="let listing of listings">
-		<div class="panel-body">
+		<div class="panel-body" *ngIf="!listing.msg">
 			<a href="{{listing.url}}" target="_blank">
 				<img src="{{ listing.imgUrl }}" 
 					 class="pull-left img-rounded cropped" 
 					 height="250" width="250">
 				<h3>{{ listing.price }}</h3>
-				<h3 *ngIf="listing.mileage">
+				<h4 *ngIf="listing.mileage">
 					{{ listing.mileage }} miles
-				</h3>
-				<h3 *ngIf="listing.description">{{ listing.description }}</h3>
+				</h4>
+				<p *ngIf="listing.description">{{ listing.description }}</p>
 			</a>
 		</div>
+		<!-- Just show 'no results' if msg was sent instead of listing obj -->
+		<p *ngIf="listing.msg">{{ listing.msg }}</p>
 	</div>
 </div>
