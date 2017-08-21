@@ -100,9 +100,8 @@ function getListingData(city, res, callback) {
 
 function getTransmissions(trans) {
 	var transmissions = ''
-	if (trans)
-		transmissions = '&auto_transmission=' + 
-						trans.replace(/,/g, '&auto_transmission=')
+	for (let t of trans)
+			transmissions += (`&auto_transmission=${t}`)
 	return transmissions
 
 }
@@ -116,12 +115,13 @@ router.get('/listings', (req, res) => {
 	// extract data from query using express
 	var minPrice = req.query.min_price, maxPrice = req.query.max_price
 	var minYear = req.query.min_auto_year, maxYear = req.query.max_auto_year
-	var makeAndModel = ''
+	var makeAndModel = '', transmissions = ''
 	// only include make and model specification if user specified them
 	if (req.query.auto_make_model)
 		makeAndModel = '&auto_make_model=' + req.query.auto_make_model
 	// get formatted query string of transmissions to consider from query
-	var transmissions = getTransmissions(req.query.auto_transmission)
+	transmissions = getTransmissions(req.query.auto_transmission)
+	//var transmissions = getTransmissions(req.query.auto_transmission)
 	var city = req.query.city
 	var url = city + baseUrl
 	var path = '/search/cta?' + 'min_price=' + minPrice + '&max_price=' + 

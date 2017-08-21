@@ -1,4 +1,4 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit} from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import {  HttpClient } from '@angular/common/http'
 
@@ -29,7 +29,7 @@ export class SearchComponent implements AfterViewInit {
 	other: boolean = false;
 	submitted: boolean = false;
 	listings: any[] = [];
-	selectedCity: string = 'chicago'
+	selectedCity: string;
 
 	cities: string[] = ['auburn', 'bham', 'dothan', 'shoals', 'gadsden', 
 						'huntsville', 'mobile', 'montgomery', 'tuscaloosa', 
@@ -137,7 +137,6 @@ export class SearchComponent implements AfterViewInit {
 		});
 	}
 
-	// 
 	getUrl() {
 		if (this.manual)
 			this.query.transmission.push(1);
@@ -145,24 +144,27 @@ export class SearchComponent implements AfterViewInit {
 			this.query.transmission.push(2);
 		if (this.other)
 			this.query.transmission.push(3);
+		let transString = '';
+		for (let trans of this.query.transmission)
+			transString += (`&auto_transmission=${trans}`)
 		let url = '/api/listings?' + `auto_make_model=${this.query.make}+` +
 				  `${this.query.model}&city=${this.selectedCity}` + 
 				  `&min_price=${this.query.minPrice}` + 
 	 			  `&max_price=${this.query.maxPrice}` + 
 	 			  `&min_auto_year=${this.query.minYear}` + 
-	 			  `&max_auto_year=${this.query.maxYear}`;
+	 			  `&max_auto_year=${this.query.maxYear}` + transString;
 	 	return url;
 	}
 
 	onSubmit() {
 		this.http.get(this.getUrl() ).subscribe(listings => {
-			this.listings = this.listings.concat(listings)
+			this.listings = this.listings.concat(listings);
 			// remove any duplicates concat created
-	 		this.removeDuplicates()
+	 		this.removeDuplicates();
 	 		// set submitted to true to show listings once returned
 	 		this.submitted = true;
 		});
-	}	
+	}
 
 	ngAfterViewInit() {
 		// Logic for price range slider
@@ -202,7 +204,6 @@ export class SearchComponent implements AfterViewInit {
 	      $('#year-range').slider('values', 1 ) );
 	    });
 	}
-
 	// clear listings from previous searches
 	clear() {
 		this.listings = [];

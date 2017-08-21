@@ -15,6 +15,10 @@ import { Observable } from 'rxjs/Observable';
 			text-decoration: none;
 			color: black;
 		}
+
+		.msg {
+			margin-left: 10px;
+		}
 	`]
 })
 export class ListingsComponent {
