@@ -17,7 +17,7 @@ import { Observable } from 'rxjs/Observable';
 		}
 
 		.msg {
-			margin-left: 10px;
+			margin-left: 15px;
 		}
 	`]
 })

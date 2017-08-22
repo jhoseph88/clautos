@@ -55,13 +55,14 @@
 				<br>
 				<!-- City selector dropdown -->
 				<label for="citySelector">City:</label><br>
-				<select [(ngModel)]="selectedCity" name="citySelector">
+				<select [(ngModel)]="selectedCity" name="citySelector" required>
 					<option *ngFor="let city of cities" [value]="city">
 						{{ city }}
 					</option>
 				</select>
 				<br>
 				<br>
+				<!-- Seaarch button to run current search/send current form -->
 				<button type="submit" class="btn btn-default" 
 						*ngIf="!submitted">	
 					Search
@@ -69,14 +70,33 @@
 				<button type="submit" class="btn btn-default" *ngIf="submitted">
 					Append
 				</button>
+				<!-- "Aggregator/national search" feature -->
+				<button type="button" class="btn" (click)="confirmNat()">
+					National Search
+				</button>
+				<div id="dialog-confirm" 
+					 title="Run a national search?"
+					 [hidden]="!nationalSearch">
+  					<p>
+  						<span class="ui-icon ui-icon-alert"></span>
+  						This requires numerous requests to search every 
+  						Craigslist subdomain and will therefore take longer to
+  						complete.
+  					</p>
+				</div>
+				<!-- "Clear" button to clear listings from current search -->
 				<button type="button" 
 						class="btn btn-danger" 
 						*ngIf="submitted"
 						(click)="clear()">	
 					Clear
 				</button>
-				<!-- Add an "aggregator/national search" button/feature here -->
 			</form>
+			<br>
+			<div class="alert alert-danger" [hidden]="!missingField">
+				<strong>Attention!</strong> The 'City' field must be specified
+				unless you are running a national search.
+			</div>
 		</div>
 	</div>
 	<div class="col-md-6" [hidden]="!submitted" id="search-results">

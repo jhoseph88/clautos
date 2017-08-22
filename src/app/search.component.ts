@@ -18,6 +18,11 @@ declare var $:any;
 			#search-form {
 				position: fixed;
 			}
+		}
+	
+		.ui-icon {
+			float: left;
+			margin: 12px 12px 20px 0;
 		}`
 	]
 })
@@ -28,6 +33,8 @@ export class SearchComponent implements AfterViewInit {
 	automatic: boolean = false;
 	other: boolean = false;
 	submitted: boolean = false;
+	nationalSearch: boolean = false;
+	missingField: boolean = false;
 	listings: any[] = [];
 	selectedCity: string;
 
@@ -137,7 +144,7 @@ export class SearchComponent implements AfterViewInit {
 		});
 	}
 
-	getUrl() {
+	getUrl(city) {
 		if (this.manual)
 			this.query.transmission.push(1);
 		if (this.automatic)
@@ -148,7 +155,7 @@ export class SearchComponent implements AfterViewInit {
 		for (let trans of this.query.transmission)
 			transString += (`&auto_transmission=${trans}`)
 		let url = '/api/listings?' + `auto_make_model=${this.query.make}+` +
-				  `${this.query.model}&city=${this.selectedCity}` + 
+				  `${this.query.model}&city=${city}` + 
 				  `&min_price=${this.query.minPrice}` + 
 	 			  `&max_price=${this.query.maxPrice}` + 
 	 			  `&min_auto_year=${this.query.minYear}` + 
@@ -157,13 +164,37 @@ export class SearchComponent implements AfterViewInit {
 	}
 
 	onSubmit() {
-		this.http.get(this.getUrl() ).subscribe(listings => {
-			this.listings = this.listings.concat(listings);
-			// remove any duplicates concat created
-	 		this.removeDuplicates();
-	 		// set submitted to true to show listings once returned
-	 		this.submitted = true;
-		});
+		// missing field if form submitted without city
+	 	this.missingField = this.selectedCity === undefined ? true : false;
+	 	// only run search if no missing fields
+	 	if (!this.missingField) {
+			this.http.get(this.getUrl(this.selectedCity) ).subscribe(listings => {
+				this.listings = this.listings.concat(listings);
+				// remove any duplicates concat created
+		 		this.removeDuplicates();
+		 		// set submitted to true to show listings once returned
+		 		this.submitted = true;
+			});
+		}
+	}
+
+	runNationalSearch() {
+		for (let city of this.cities) {
+			this.http.get(this.getUrl(city) ).subscribe(listings => {
+				this.submitted = true;
+				// don't say 'No results' until national search is done running
+				if (!listings.hasOwnProperty('msg') ) {
+					this.listings = this.listings.concat(listings);
+					// remove any duplicates concat created
+	 				this.removeDuplicates();
+	 			}
+	 			// if search complete and still no listings found, 
+	 			// say 'No results'
+				if (city == this.cities[this.cities.length - 1] && 
+					this.listings.length === 0)
+					this.listings.push({msg: 'No results.'});
+			});
+		}
 	}
 
 	ngAfterViewInit() {
@@ -203,6 +234,29 @@ export class SearchComponent implements AfterViewInit {
 	      $('#year').val($('#year-range').slider('values', 0 ) + ' - ' + 
 	      $('#year-range').slider('values', 1 ) );
 	    });
+	}
+
+	confirmNat() {
+		this.nationalSearch = true;
+		$( () => {
+			$("#dialog-confirm").dialog({
+				resizable: false,
+				height: "auto",
+				width: 400,
+				modal: true,
+				buttons: {
+					"Run national search": () => {
+						$("#dialog-confirm").dialog("close");
+						this.nationalSearch = false;
+						this.runNationalSearch();
+					},
+					Cancel: () => {
+						$("#dialog-confirm").dialog("close");
+						this.nationalSearch = false;
+					}
+				}
+			});
+		});
 	}
 	// clear listings from previous searches
 	clear() {
