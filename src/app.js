@@ -24,4 +24,4 @@ app.get('*', (req, res) => {
 // const port = process.env.port || 3000
 // app.set('port', port)
 
-app.listen(process.env.port || 3000, () => console.log(`API running on localhost:${port}`) )
+app.listen(process.env.PORT || 3000, () => {}) )
