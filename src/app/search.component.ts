@@ -205,16 +205,15 @@ export class SearchComponent implements AfterViewInit {
 					// remove any duplicates concat created
 	 				this.removeDuplicates();
 	 			}
+	 			// rough way of detecting when search is through
+				if (city === this.cities[this.cities.length - 1]) {
+					// if still no listings found, say 'No results.'
+					if (this.listings.length === 0)
+						this.listings.push({msg: 'No results.'});
+					// set searchCompleted = true to remove progress spinner
+					this.searchCompleted = true;
+				}
 			});
-			// rough way of detecting when search is through
-			if (city === this.cities[this.cities.length]) {
-				// if still no listings found, say 'No results.'
-				if (this.listings.length === 0)
-					this.listings.push({msg: 'No results.'});
-				// set searchCompleted = true to remove progress spinner
-				this.listings.push({msg: 'No results.'});
-			}
-
 		}
 	}
 
