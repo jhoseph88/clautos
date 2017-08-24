@@ -35,7 +35,7 @@ export class SearchComponent implements AfterViewInit {
 	submitted: boolean = false;
 	nationalSearch: boolean = false;
 	missingField: boolean = false;
-	searchCompleted: boolean = true;
+	searchCompleted: boolean = false;
 	listings: any[] = [];
 	selectedCity: string;
 
