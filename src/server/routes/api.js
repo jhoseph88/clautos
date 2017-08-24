@@ -124,8 +124,9 @@ router.get('/listings', (req, res) => {
 	if (req.query.auto_make_model)
 		makeAndModel = '&auto_make_model=' + req.query.auto_make_model
 	// get formatted query string of transmissions to consider from query
-	transmissions = getTransmissions(req.query.auto_transmission)
-	//var transmissions = getTransmissions(req.query.auto_transmission)
+	// (will be empty string if not specified (undefined) )
+	if (req.query.auto_transmission)
+		transmissions = getTransmissions(req.query.auto_transmission)
 	var city = req.query.city
 	var url = city + baseUrl
 	var path = '/search/cta?' + 'min_price=' + minPrice + '&max_price=' + 
