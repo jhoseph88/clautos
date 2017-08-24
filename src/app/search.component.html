@@ -101,14 +101,11 @@
 	</div>
 	<div class="col-md-6" [hidden]="!submitted" id="search-results">
 		<br>
-		<span>
-			<h4 [style.display]="inline">Search Results:</h4>
-			<md-spinner [strokeWidth]="40" 
-						[style.display]="inline"
-						[style.float]="right"
-						*ngIf="!searchCompleted">
-			</md-spinner>
-		</span>
+		<h4>Search Results:</h4>
+		<md-spinner [strokeWidth]="40" 
+					class="pull-right"
+					*ngIf="!searchCompleted">
+		</md-spinner>
 		<app-listings [listings]="listings"></app-listings>
 	</div>
 </div>
