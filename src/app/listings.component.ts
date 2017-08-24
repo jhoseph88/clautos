@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 
 import { Observable } from 'rxjs/Observable';
+import { MdProgressSpinner } from '@angular/material';
 
 @Component({
 	selector: 'app-listings',
@@ -19,10 +20,11 @@ import { Observable } from 'rxjs/Observable';
 		.msg {
 			margin-left: 15px;
 		}
-	`]
+	`],
+	providers: [MdProgressSpinner]
 })
 export class ListingsComponent {
 	@Input() listings: any[];
 
-	constructor() {}
+	constructor(spinner: MdProgressSpinner) {}
 }

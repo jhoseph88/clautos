@@ -1,6 +1,6 @@
 import { Component, AfterViewInit} from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import {  HttpClient } from '@angular/common/http'
+import { HttpClient } from '@angular/common/http'
 
 import { Query } from './query';
 
@@ -35,6 +35,7 @@ export class SearchComponent implements AfterViewInit {
 	submitted: boolean = false;
 	nationalSearch: boolean = false;
 	missingField: boolean = false;
+	searchCompleted: boolean = true;
 	listings: any[] = [];
 	selectedCity: string;
 
@@ -164,21 +165,37 @@ export class SearchComponent implements AfterViewInit {
 	}
 
 	onSubmit() {
+		// set searchCompleted = false to display progress spinner
+		this.searchCompleted = false;
 		// missing field if form submitted without city
 	 	this.missingField = this.selectedCity === undefined ? true : false;
 	 	// only run search if no missing fields
 	 	if (!this.missingField) {
-			this.http.get(this.getUrl(this.selectedCity) ).subscribe(listings => {
-				this.listings = this.listings.concat(listings);
-				// remove any duplicates concat created
-		 		this.removeDuplicates();
-		 		// set submitted to true to show listings once returned
-		 		this.submitted = true;
-			});
+			this.http.get(this.getUrl(this.selectedCity) ).subscribe(
+				listings => {
+					this.listings = this.listings.concat(listings);
+					// remove any duplicates concat created
+			 		this.removeDuplicates();
+			 		// set submitted to true to show listings once returned
+			 		this.submitted = true;
+				},
+				// log the error if there was one
+				error => console.log(error),
+				// detects when the search is through
+				() => {
+					// if still no listings found, say 'No results.'
+					if (this.listings.length === 0)
+						this.listings.push({msg: 'No results.'});
+					// set searchCompleted = true to remove progress spinner
+					this.searchCompleted = true;
+				}
+			);
 		}
 	}
 
 	runNationalSearch() {
+		// set searchCompleted = false to display progress spinner
+		this.searchCompleted = false;
 		for (let city of this.cities) {
 			this.http.get(this.getUrl(city) ).subscribe(listings => {
 				this.submitted = true;
@@ -188,12 +205,16 @@ export class SearchComponent implements AfterViewInit {
 					// remove any duplicates concat created
 	 				this.removeDuplicates();
 	 			}
-	 			// if search complete and still no listings found, 
-	 			// say 'No results'
-				if (city == this.cities[this.cities.length - 1] && 
-					this.listings.length === 0)
-					this.listings.push({msg: 'No results.'});
 			});
+			// rough way of detecting when search is through
+			if (city === this.cities[this.cities.length]) {
+				// if still no listings found, say 'No results.'
+				if (this.listings.length === 0)
+					this.listings.push({msg: 'No results.'});
+				// set searchCompleted = true to remove progress spinner
+				this.listings.push({msg: 'No results.'});
+			}
+
 		}
 	}
 

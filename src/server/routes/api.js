@@ -114,10 +114,6 @@ function getTransmissions(trans) {
 
 }
 
-// router.get('/', (req, res) => {
-// 	res.send('api works')
-// });
-
 // Get matching listings
 router.get('/listings', (req, res) => {
 	// extract data from query using express
