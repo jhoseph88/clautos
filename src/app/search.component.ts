@@ -12,6 +12,7 @@ declare var $:any;
 	styles: [
 		`#search-form-outer {
 			position: relative;
+			max-width: 640px;
 		}
 
 		@media (min-width: 992px) {
@@ -218,6 +219,8 @@ export class SearchComponent implements AfterViewInit {
 	}
 
 	ngAfterViewInit() {
+		// sort cities alphabetically
+		this.cities.sort();
 		// Logic for price range slider
     	$( () => {
 	      $('#price-range').slider({
