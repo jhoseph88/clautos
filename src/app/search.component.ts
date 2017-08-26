@@ -1,4 +1,4 @@
-import { Component, AfterViewInit} from '@angular/core';
+import { Component, OnInit, AfterViewInit} from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { HttpClient } from '@angular/common/http'
 
@@ -27,7 +27,7 @@ declare var $:any;
 		}`
 	]
 })
-export class SearchComponent implements AfterViewInit {
+export class SearchComponent implements OnInit, AfterViewInit {
 	// example/default query
 	query: Query = new Query('', '', 0, 100000, [], 1999, 2006);
 	manual: boolean = false;
@@ -218,9 +218,12 @@ export class SearchComponent implements AfterViewInit {
 		}
 	}
 
-	ngAfterViewInit() {
+	ngOnInit() {
 		// sort cities alphabetically
 		this.cities.sort();
+	}
+
+	ngAfterViewInit() {
 		// Logic for price range slider
     	$( () => {
 	      $('#price-range').slider({
