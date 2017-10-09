@@ -42,7 +42,7 @@ function getListingDetail(listingUrl, imgFileName, price, callback) {
 		descMatches = description ? descContentRegex.exec(description) : ''
 		description = descMatches ? descMatches[0] : ''
 		description = description.replace(/"/g, '')
-
+		
 		callback({url: listingUrl, imgUrl: imgUrl, price: price, 
 				  mileage: miles, description: description })
 	})
@@ -53,7 +53,7 @@ function getListingDetail(listingUrl, imgFileName, price, callback) {
    { listingUrl, imgUrl, price} */
 function getListingData(city, res, callback) {
 	// get array of anchor tag strings--one string for each listing
-	var metaRegex = /"\/.*html.*result-image.*>\n.*</gm
+	var metaRegex = /<a.*\n[\s]+.*result-price.*\n[\s]+<\/a>/gm
 	var anchorMatches = res.match(metaRegex)
 	// return immediately if no results found
 	if (anchorMatches === null) {
@@ -65,9 +65,7 @@ function getListingData(city, res, callback) {
 		return anchorMatches.indexOf(elt) === idx
 	})
 
-	var listingBaseUrl = 'https://' + city + baseUrl
-
-	var urlRegex = /"\/[a-z]{3}.*[0-9]*\.html/gm
+	var urlRegex = /https:.*[0-9]*\.html/gm
 	var imgRegEx = /[0-9a-zA-Z]{5}_[a-zA-Z0-9]{11}/
 	var priceRegex = /\$[0-9]*/
 
@@ -75,19 +73,19 @@ function getListingData(city, res, callback) {
 	var listingUrl = '', imgFileName = '', imgMatch, imageUrl = ''
 	var i = anchorElts.length
 	var urls = []
-
 	/* loop through anchorElts, fetch each listing url, and add a listing object
 	   for each listing found containing the listings's url and its image url */
 	anchorElts.forEach( (anchorElt) => {
 		urls = anchorElt.match(urlRegex)
 		if (urls)
-			listingUrl = listingBaseUrl + urls[0].substr(1)
+			listingUrl = urls[0]
 		else {
 			callback({msg: 'No results.'})
 			return
 		}
 		price = anchorElt.match(priceRegex)
 		price = price ? anchorElt.match(priceRegex)[0] : 0
+
 		imgMatch = anchorElt.match(imgRegEx)
 		// default image if none found
 		if (!imgMatch) {
