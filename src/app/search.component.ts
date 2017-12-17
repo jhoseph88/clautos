@@ -156,7 +156,7 @@ export class SearchComponent implements OnInit, AfterViewInit {
 		let transString = '';
 		for (let trans of this.query.transmission)
 			transString += (`&auto_transmission=${trans}`)
-		let url = '/api/listings?' + `auto_make_model=${this.query.make}+` +
+		let url = '/listings?' + `auto_make_model=${this.query.make}+` +
 				  `${this.query.model}&city=${city}` + 
 				  `&min_price=${this.query.minPrice}` + 
 	 			  `&max_price=${this.query.maxPrice}` + 
@@ -172,7 +172,8 @@ export class SearchComponent implements OnInit, AfterViewInit {
 	 	this.missingField = this.selectedCity === undefined ? true : false;
 	 	// only run search if no missing fields
 	 	if (!this.missingField) {
-			this.http.get(this.getUrl(this.selectedCity) ).subscribe(
+	 		let url = 'https://leq5u0l178.execute-api.us-east-1.amazonaws.com/omega' + this.getUrl(this.selectedCity);
+			this.http.get(url).subscribe(
 				listings => {
 					this.listings = this.listings.concat(listings);
 					// remove any duplicates concat created
